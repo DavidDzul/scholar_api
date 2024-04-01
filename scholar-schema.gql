@@ -1,0 +1,18 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Query {
+  profile: String!
+}
+
+type Mutation {
+  register(registerUserInput: RegisterUserInput!): String!
+}
+
+input RegisterUserInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String!
+}

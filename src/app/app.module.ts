@@ -2,11 +2,14 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
-import { HelloWorldModule } from './hello-world/hello-world.module';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { typeOrmEntities } from '../entities';
+import { typeOrmEntities } from '../../entities';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+
+import { AuthModule } from './auth/auth.module';
+
+export const appModules = [AuthModule];
 
 @Module({
   imports: [
@@ -33,13 +36,17 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       },
       inject: [ConfigService],
     }),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    ...appModules,
+    GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'schema.gql'),
-      playground: false,
-      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      useFactory: () => ({
+        autoSchemaFile: join(process.cwd(), 'scholar-schema.gql'),
+        playground: false,
+        plugins: [ApolloServerPluginLandingPageLocalDefault()],
+        path: '/graphql',
+        include: [...appModules],
+      }),
     }),
-    HelloWorldModule,
   ],
   controllers: [],
   providers: [],
