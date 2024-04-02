@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'entities/user.entity';
+import { User } from 'libs/entities/user.entity';
 import { Repository } from 'typeorm';
 
 import { CreateUserInput } from './dto';
@@ -38,5 +38,9 @@ export class UsersService {
     return this.usersRepository.findOne({
       where: { email: email },
     });
+  }
+
+  findOne(id: number) {
+    return this.usersRepository.findOne({ where: { id: id } });
   }
 }

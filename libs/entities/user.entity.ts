@@ -4,10 +4,14 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  BeforeInsert,
+  BeforeUpdate,
 } from 'typeorm';
-import { Field, Int } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
+import * as bcrypt from 'bcrypt';
 
-@Entity()
+@ObjectType()
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   @Field(() => Int)
@@ -40,4 +44,13 @@ export class User {
   @UpdateDateColumn()
   @Field()
   updatedAt: string;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashPassword() {
+    if (this.password && !this.password.startsWith('$2b$10$')) {
+      const salt = await bcrypt.genSalt(10);
+      this.password = await bcrypt.hash(this.password, salt);
+    }
+  }
 }
